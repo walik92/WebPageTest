@@ -1,0 +1,73 @@
+﻿<Window x:Class="WebPageTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WebPageTest"
+        xmlns:converters="clr-namespace:WebPageTest.Converters"
+        mc:Ignorable="d"
+        Title="Web Page Test" Height="450" Width="800">
+    <Window.Resources>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Margin="10"
+              IsEnabled="{Binding ProgressBarVisibility, Converter={StaticResource InverseBooleanConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" VerticalContentAlignment="Center" TextWrapping="NoWrap" Height="30"
+                     Text="{Binding Url}" />
+            <Button Grid.Column="1" Content="Start" Height="30" Command="{Binding StartCommand}" />
+        </Grid>
+        <Grid Margin="10" Grid.Row="1"
+              Visibility="{Binding ProgressBarVisibility, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ProgressBar IsIndeterminate="True" Margin="0" Height="10" />
+        </Grid>
+        <WrapPanel Grid.Row="2" Margin="10"
+                   Visibility="{Binding ResultTest, Converter={StaticResource NullToVisibilityConverter}}">
+            <Label Content="{Binding ResultTest.BytesReceived}" ContentStringFormat="Total size: {0} bytes" />
+            <Label Content="{Binding ResultTest.ElapsedTime}" ContentStringFormat="Total elapsed time: {0} seconds" />
+        </WrapPanel>
+        <Grid Grid.Row="3" Margin="10">
+            <DataGrid ItemsSource="{Binding ResultTest.Entries}" ScrollViewer.CanContentScroll="True"
+                      Visibility="{Binding ResultTest, Converter={StaticResource NullToVisibilityConverter}}"
+                      CanUserReorderColumns="True" CanUserResizeColumns="True" IsReadOnly="True"
+                      CanUserResizeRows="False" HeadersVisibility="Column" AutoGenerateColumns="False"
+                      CanUserSortColumns="True">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Time chart" Width="200" SortMemberPath="ChartLeft">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Canvas>
+                                    <Rectangle
+                                        Canvas.Left="{Binding ChartLeft}" HorizontalAlignment="Left" Canvas.Top="0"
+                                        Height="20" Width="{Binding ChartWidth}"
+                                        Fill="#f2b632" />
+                                </Canvas>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Started" Width="100"
+                                        Binding="{Binding StartedTime, StringFormat={}+{0:#,0.000 seconds}}" />
+                    <DataGridTextColumn Header="Time" Width="100"
+                                        Binding="{Binding Time, StringFormat={}{0:#,0.000 seconds}}" />
+                    <DataGridTextColumn Header="Received Bytes" Width="100"
+                                        Binding="{Binding BytesReceived, StringFormat={}{0:# bytes}}" />
+                    <DataGridTextColumn Header="Method" Width="100" Binding="{Binding Method}" />
+                    <DataGridTextColumn Header="HTTP Status" Width="100" Binding="{Binding Code}" />
+                    <DataGridTextColumn Header="Url" Binding="{Binding Url}" Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</Window>
