@@ -11,7 +11,8 @@ namespace WebPageTest.Helpers
             if (!url.IsUrlValid()) throw new Exception($"Incorrect URL {url}");
 
             var controller = new Controller();
-            var plugin = controller.Chrome.New();
+            var plugin = controller.Firefox.New();
+            plugin.Log.EnableFilter(false);
             plugin.ClearCache();
             plugin.Record();
             plugin.GotoURL(url);
